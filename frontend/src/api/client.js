@@ -38,8 +38,23 @@ export const login = async (username, password) => {
   return client.post('/auth/login', { username, password });
 };
 
-export const register = async (username, password) => {
-  return client.post('/auth/register', { username, password });
+export const register = async (username, email, password) => {
+  return client.post('/auth/register', { username, email, password });
+};
+
+export const forgotPassword = async (email) => {
+  const response = await client.post('/auth/forgot-password', { email });
+  return response.data;
+};
+
+export const resetPassword = async (token, new_password) => {
+  const response = await client.post('/auth/reset-password', { token, new_password });
+  return response.data;
+};
+
+export const updatePassword = async (current_password, new_password) => {
+  const response = await client.post('/auth/update-password', { current_password, new_password });
+  return response.data;
 };
 
 export const getMe = async () => {

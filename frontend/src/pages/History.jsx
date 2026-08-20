@@ -59,7 +59,7 @@ export default function History() {
     } catch (err) {
       console.error('Error loading scan for dashboard:', err);
     }
-    navigate(`/?scan=${scan.scan_id}`);
+    navigate(`/scanner?scan=${scan.scan_id}`);
   };
 
   const handleOpenAIReport = async (scan) => {

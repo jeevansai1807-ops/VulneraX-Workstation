@@ -402,10 +402,18 @@ async def get_report(scan_id: str, format: str = "json", user_id: int = Depends(
         raise HTTPException(status_code=404, detail="Scan not found")
         
     try:
-        data = json.loads(scan.get("results_json", "{}"))
+        results_json = scan.get("results_json")
+        data = json.loads(results_json) if results_json else {}
+        
+        # Inject metadata from database row if missing in results_json
+        data["scan_id"] = scan.get("id", scan_id)
+        data["target"] = scan.get("target", "Unknown")
+        data["status"] = scan.get("status", "pending")
+        data["timestamp"] = scan.get("timestamp", "")
+        
         scan_result = ScanResult(**data)
-    except Exception:
-        raise HTTPException(status_code=500, detail="Failed to parse scan data")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to parse scan data: {str(e)}")
 
     if scan_result.status not in ("completed", "aborted", "error"):
         raise HTTPException(status_code=400, detail="Scan is still in progress")

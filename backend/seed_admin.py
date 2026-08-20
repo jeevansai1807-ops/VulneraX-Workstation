@@ -18,12 +18,13 @@ async def seed_admin():
         new_password = "VulneraX_Admin!2026"
         hashed_password = get_password_hash(new_password)
         if not admin:
-            new_admin = User(username="admin", hashed_password=hashed_password)
+            new_admin = User(username="admin", email="admin@vulnerax.local", hashed_password=hashed_password)
             session.add(new_admin)
             await session.commit()
             print("Admin user created successfully.")
         else:
             admin.hashed_password = hashed_password
+            admin.email = "admin@vulnerax.local"
             await session.commit()
             print("Admin user password updated successfully.")
 

@@ -10,3 +10,6 @@ scans/VulneraX.db
 *.sqlite
 frontend/node_modules/
 .DS_Store
+build/
+dist/
+*.spec

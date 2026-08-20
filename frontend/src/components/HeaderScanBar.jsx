@@ -32,7 +32,7 @@ export default function HeaderScanBar({ onScan, isScanning }) {
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300">Command Center</p>
-          <h1 className="mt-2 text-3xl font-semibold text-foreground">AI-Powered Security Assessment Platform</h1>
+          <h1 className="mt-2 text-3xl font-semibold text-foreground">VulneraX</h1>
           <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
             Launch scans, monitor assessment progress, review vulnerabilities, and export actionable reports from one
             high-signal workspace.

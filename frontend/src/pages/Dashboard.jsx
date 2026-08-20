@@ -13,7 +13,8 @@ import RemediationPanel from '../components/RemediationPanel';
 import AttackGraph from '../components/AttackGraph';
 import { startScan, getScanStatus, getScanResults, abortScan } from '../api/client';
 import ScanWebSocket from '../api/websocket';
-import { Activity, Network, Globe, Lock, ShieldAlert, ExternalLink, PlusCircle, XCircle, Share2 } from 'lucide-react';
+import { Activity, Network, Globe, Lock, ShieldAlert, ExternalLink, PlusCircle, XCircle, Share2, AlertTriangle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
@@ -30,14 +31,19 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedVuln, setSelectedVuln] = useState(null);
+  const [showAbortModal, setShowAbortModal] = useState(false);
   const pollRef = useRef(null);
   const wsRef = useRef(null);
   const containerRef = useRef(null);
 
-  const handleAbort = async () => {
+  const handleAbortRequest = () => {
     if (!scanId && !isScanning) return;
-    if (!window.confirm('Are you sure you want to abort the ongoing scan?')) return;
+    setShowAbortModal(true);
+  };
 
+  const confirmAbort = async () => {
+    setShowAbortModal(false);
+    
     if (pollRef.current) {
       clearInterval(pollRef.current);
       pollRef.current = null;
@@ -69,6 +75,10 @@ export default function Dashboard() {
       currentPhase: 'Aborted',
       error: 'Scan aborted by user'
     }));
+  };
+
+  const cancelAbort = () => {
+    setShowAbortModal(false);
   };
 
   // GSAP Animations
@@ -328,7 +338,7 @@ export default function Dashboard() {
               <div className="flex items-center gap-2">
                 {isScanning && (
                   <button
-                    onClick={handleAbort}
+                    onClick={handleAbortRequest}
                     className="flex items-center gap-1.5 px-4 py-2.5 bg-destructive/10 hover:bg-destructive/20 text-destructive border border-destructive/30 font-medium text-sm rounded-xl transition-all shadow-sm hover:scale-[1.02] active:scale-[0.98]"
                     title="Abort ongoing scan"
                   >
@@ -357,7 +367,7 @@ export default function Dashboard() {
           {/* Scan Progress */}
           {isScanning && (
             <div className="shrink-0">
-              <ScanProgress status={scanStatus} currentPhase={currentPhase} onAbort={handleAbort} />
+              <ScanProgress status={scanStatus} currentPhase={currentPhase} onAbort={handleAbortRequest} />
             </div>
           )}
 
@@ -451,6 +461,45 @@ export default function Dashboard() {
         </div>
         
       <RemediationPanel vulnerability={selectedVuln} onClose={() => setSelectedVuln(null)} scanId={scanId} />
+
+      {/* Abort Confirmation Modal */}
+      <AnimatePresence>
+        {showAbortModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="bg-card border border-border rounded-xl shadow-lg w-full max-w-md overflow-hidden"
+            >
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-4 text-destructive">
+                  <AlertTriangle className="h-6 w-6" />
+                  <h3 className="text-xl font-bold">Abort Scan</h3>
+                </div>
+                <p className="text-muted-foreground mb-6">
+                  Are you sure you want to abort the ongoing scan? Any partial results may be incomplete.
+                </p>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={cancelAbort}
+                    className="px-4 py-2 rounded-md hover:bg-muted text-muted-foreground font-medium transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmAbort}
+                    className="px-4 py-2 rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 font-medium transition-colors"
+                  >
+                    Yes, Abort
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

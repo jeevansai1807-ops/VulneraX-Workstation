@@ -1,31 +1,51 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { login } from '../api/client';
+import { resetPassword } from '../api/client';
 import { Lock, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../components/ThemeProvider';
 import Logo from '../components/Logo';
 
-export default function Login() {
+export default function ResetPassword() {
   const { theme, toggleTheme } = useTheme();
-  const [email, setEmail] = useState('');
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const token = searchParams.get('token');
+  
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = async (e) => {
+  useEffect(() => {
+    if (!token) {
+      setError('Invalid or missing reset token.');
+    }
+  }, [token]);
+
+  const handleReset = async (e) => {
     e.preventDefault();
+    setMessage('');
+    setError('');
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    
     try {
-      const res = await login(email, password);
-      localStorage.setItem('vulnerax_token', res.data.access_token);
-      window.location.href = '/';
+      const res = await resetPassword(token, password);
+      setMessage(res.message || 'Password successfully reset.');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Login failed');
+      setError(err.message || 'Failed to reset password');
     }
   };
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-4">
-      {/* Top Bar for Auth pages */}
       <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-20">
         <Link to="/" className="text-2xl font-black text-foreground flex items-center gap-3 hover:opacity-80 transition-opacity">
           <Logo size="sm" />
@@ -38,9 +58,6 @@ export default function Login() {
           >
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
-          <div className="text-sm text-foreground/60 font-medium">
-            Don't have an account? <Link to="/register" className="text-primary hover:text-foreground transition-colors ml-1 font-bold">Sign up</Link>
-          </div>
         </div>
       </div>
 
@@ -54,8 +71,8 @@ export default function Login() {
           <Logo size="xl" />
         </div>
         
-        <h1 className="text-3xl font-bold text-foreground text-center mb-2">Welcome Back</h1>
-        <p className="text-foreground/60 text-center mb-8 text-sm">Enter your credentials to access the network.</p>
+        <h1 className="text-3xl font-bold text-foreground text-center mb-2">Set New Password</h1>
+        <p className="text-foreground/60 text-center mb-8 text-sm">Enter a new secure password for your account.</p>
         
         {error && (
           <motion.div 
@@ -66,41 +83,45 @@ export default function Login() {
           </motion.div>
         )}
         
-        <form onSubmit={handleLogin} className="space-y-4">
+        {message && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+            className="p-3 mb-6 text-sm text-emerald-500 bg-emerald-500/10 rounded-lg border border-emerald-500/20 text-center font-medium"
+          >
+            {message}
+          </motion.div>
+        )}
+        
+        <form onSubmit={handleReset} className="space-y-4">
           <div>
             <input 
-              type="text" 
-              placeholder="Username or Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="password" 
+              placeholder="New Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full p-3.5 rounded-xl bg-foreground/5 text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all border border-border focus:border-primary/50"
               required
+              disabled={!token}
             />
           </div>
           <div>
             <input 
               type="password" 
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Confirm New Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full p-3.5 rounded-xl bg-foreground/5 text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all border border-border focus:border-primary/50"
               required
+              disabled={!token}
             />
           </div>
           
-          <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center gap-2">
-              <input type="checkbox" id="remember" className="w-4 h-4 rounded border-foreground/20 text-primary focus:ring-primary bg-foreground/5 accent-primary" />
-              <label htmlFor="remember" className="text-sm text-foreground/70 cursor-pointer">Remember me</label>
-            </div>
-            <Link to="/forgot-password" className="text-sm text-primary hover:text-foreground transition-colors">Forgot password?</Link>
-          </div>
-
           <button 
             type="submit" 
-            className="w-full mt-6 py-3.5 px-4 bg-primary text-primary-foreground rounded-xl font-bold hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
+            disabled={!token}
+            className="w-full mt-6 py-3.5 px-4 bg-primary text-primary-foreground rounded-xl font-bold hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign In
+            Reset Password
           </button>
         </form>
 

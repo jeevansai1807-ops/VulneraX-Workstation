@@ -12,7 +12,7 @@ class ScanWebSocket {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     // Use the same host as the API, assuming proxy setup
     const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/api/ws/scan/${this.scanId}`;
+    const wsUrl = `${protocol}//${host}/ws/scan/${this.scanId}`;
 
     this.ws = new WebSocket(wsUrl);
 

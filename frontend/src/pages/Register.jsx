@@ -10,6 +10,7 @@ export default function Register() {
   const { theme, toggleTheme } = useTheme();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
@@ -18,11 +19,11 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const res = await register(email, password);
+      const res = await register(username, email, password);
       localStorage.setItem('vulnerax_token', res.data.access_token);
       window.location.href = '/';
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      setError(err.response?.data?.detail || err.message || 'Registration failed');
     }
   };
 
@@ -89,7 +90,17 @@ export default function Register() {
           <div>
             <input 
               type="text" 
-              placeholder="Username or Email"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-3.5 rounded-xl bg-foreground/5 text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all border border-border focus:border-primary/50"
+              required
+            />
+          </div>
+          <div>
+            <input 
+              type="email" 
+              placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-3.5 rounded-xl bg-foreground/5 text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all border border-border focus:border-primary/50"

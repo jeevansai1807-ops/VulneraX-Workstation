@@ -8,7 +8,21 @@ from sqlalchemy.orm import relationship
 # Import WebSocket broadcaster
 from api.ws_scan import broadcast_scan_update
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///../scans/VulneraX.db")
+import platform
+
+def get_app_data_dir():
+    if platform.system() == "Windows":
+        base = os.getenv("APPDATA") or os.path.expanduser("~")
+        return os.path.join(base, "VulneraX")
+    else:
+        return os.path.join(os.path.expanduser("~"), ".vulnerax")
+
+_APP_DATA_DIR = get_app_data_dir()
+os.makedirs(_APP_DATA_DIR, exist_ok=True)
+
+_DEFAULT_DB_PATH = os.path.join(_APP_DATA_DIR, "vulnerax_v2.db").replace("\\", "/")
+
+DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite+aiosqlite:///{_DEFAULT_DB_PATH}")
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -19,7 +33,10 @@ class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, index=True, nullable=False)
+    email = Column(String(100), unique=True, index=True, nullable=False, server_default="placeholder@vulnerax.local")
     hashed_password = Column(String(128), nullable=False)
+    reset_token = Column(String(100), nullable=True, index=True)
+    reset_token_expires = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     scans = relationship("Scan", back_populates="user", cascade="all, delete-orphan")
@@ -38,9 +55,6 @@ class Scan(Base):
     user = relationship("User", back_populates="scans")
 
 async def init_db():
-    if "sqlite" in DATABASE_URL:
-        os.makedirs(os.path.join(os.path.dirname(os.path.dirname(__file__)), "scans"), exist_ok=True)
-    
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
