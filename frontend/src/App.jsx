@@ -13,7 +13,6 @@ import Contact from './pages/Contact';
 import Users from './pages/Users';
 import Settings from './pages/Settings';
 import Landing from './pages/Landing';
-import Hero3D from './components/Hero3D';
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { ThemeProvider } from './components/ThemeProvider';
 
@@ -65,7 +64,6 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <div className="relative w-screen h-screen overflow-hidden bg-background text-foreground transition-colors duration-500">
-          <Hero3D />
           <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/40 to-background/80 pointer-events-none z-0" />
           
           <div className="relative z-10 w-full h-full">

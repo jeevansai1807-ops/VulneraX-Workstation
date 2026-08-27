@@ -4,10 +4,12 @@ import { motion } from 'framer-motion';
 import { login } from '../api/client';
 import { Lock, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../components/ThemeProvider';
+import { useAuth } from '../lib/AuthContext';
 import Logo from '../components/Logo';
 
 export default function Login() {
   const { theme, toggleTheme } = useTheme();
+  const { setUser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
