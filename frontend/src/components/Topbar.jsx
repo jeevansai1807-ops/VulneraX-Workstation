@@ -12,6 +12,7 @@ export default function Topbar() {
   const navigate = useNavigate();
 
   const menuItems = [
+    { id: 'home', label: 'Home', path: '/' },
     { id: 'scanner', label: 'Scanner', path: '/scanner' },
     { id: 'database', label: 'Database', path: '/database' },
     { id: 'settings', label: 'Settings', path: '/settings' },
@@ -34,6 +35,7 @@ export default function Topbar() {
             <NavLink
               key={item.id}
               to={item.path}
+              end={item.path === '/'}
               className={({ isActive }) => 
                 `text-base font-bold transition-all ${
                   isActive ? 'text-primary drop-shadow-sm' : 'text-foreground/70 hover:text-foreground'

@@ -5,6 +5,7 @@ import { register } from '../api/client';
 import { Lock, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../components/ThemeProvider';
 import Logo from '../components/Logo';
+import CyberOrb3D from '../components/CyberOrb3D';
 
 export default function Register() {
   const { theme, toggleTheme } = useTheme();
@@ -28,9 +29,9 @@ export default function Register() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center p-4">
+    <div className="w-full h-full min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden py-12">
       {/* Top Bar for Auth pages */}
-      <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-20">
+      <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-20 max-w-7xl mx-auto">
         <Link to="/" className="text-2xl font-black text-foreground flex items-center gap-3 hover:opacity-80 transition-opacity">
           <Logo size="sm" />
           <span>Vulnera<span className="text-primary">X</span></span>
@@ -52,10 +53,16 @@ export default function Register() {
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full max-w-[420px] glass-panel p-8 relative z-10"
+        className="w-full max-w-[420px] glass-panel p-8 relative z-10 my-auto"
       >
-        <div className="flex justify-center mb-6">
-          <Logo size="xl" />
+        <div className="flex flex-col items-center justify-center -mt-16 mb-2">
+          <CyberOrb3D 
+            size="medium" 
+            interactive={true}
+            showRings={true}
+            showParticles={false}
+            className="scale-95"
+          />
         </div>
         
         <h1 className="text-3xl font-bold text-foreground text-center mb-2">Create Account</h1>
@@ -129,7 +136,7 @@ export default function Register() {
           
           <button 
             type="submit" 
-            className="w-full mt-6 py-3.5 px-4 bg-primary text-primary-foreground rounded-xl font-bold hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
+            className="w-full mt-6 py-3.5 px-4 btn-cyber-primary text-primary-foreground rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(244,63,94,0.35)] cursor-pointer"
           >
             Sign Up
           </button>

@@ -38,64 +38,63 @@ export default function RiskGauge({ score, status }) {
     function draw(currentScore) {
       ctx.clearRect(0, 0, size, size);
 
-      // Background arc
+      // Background Arc
       ctx.beginPath();
       ctx.arc(cx, cy, radius, startAngle, endAngle);
-      ctx.strokeStyle = 'rgba(99, 102, 241, 0.1)';
+      ctx.strokeStyle = 'rgba(244, 63, 94, 0.12)';
       ctx.lineWidth = lineWidth;
       ctx.lineCap = 'round';
       ctx.stroke();
 
-      // Score arc
+      // Score Gradient Arc: Coral -> Magenta -> Purple -> Emerald
       const scoreAngle = startAngle + (currentScore / 100) * Math.PI;
       const gradient = ctx.createLinearGradient(0, cy, size, cy);
-      gradient.addColorStop(0, '#ef4444');
-      gradient.addColorStop(0.3, '#f97316');
-      gradient.addColorStop(0.5, '#eab308');
-      gradient.addColorStop(0.7, '#3b82f6');
-      gradient.addColorStop(1, '#34d399');
+      gradient.addColorStop(0, '#f43f5e'); // Critical - Fuchsia
+      gradient.addColorStop(0.3, '#fb923c'); // High - Coral
+      gradient.addColorStop(0.6, '#d946ef'); // Medium - Magenta
+      gradient.addColorStop(0.85, '#8b5cf6'); // Good - Purple
+      gradient.addColorStop(1, '#34d399'); // Excellent - Emerald
 
       ctx.beginPath();
       ctx.arc(cx, cy, radius, startAngle, scoreAngle);
-      ctx.strokeStyle = status === 'aborted' ? '#f43f5e' : isRunning ? '#f59e0b' : gradient;
+      ctx.strokeStyle = status === 'aborted' ? '#f43f5e' : isRunning ? '#fb923c' : gradient;
       ctx.lineWidth = lineWidth;
       ctx.lineCap = 'round';
       ctx.stroke();
 
-      // Glow effect
+      // Neon Outer Glow effect
       ctx.beginPath();
       ctx.arc(cx, cy, radius, startAngle, scoreAngle);
-      ctx.strokeStyle = info.color + '30';
+      ctx.strokeStyle = (info.color || '#f43f5e') + '30';
       ctx.lineWidth = lineWidth + 8;
       ctx.lineCap = 'round';
       ctx.stroke();
 
-      // Score text
-      ctx.fillStyle = info.color;
+      // Score Value text
+      ctx.fillStyle = info.color || '#f43f5e';
       if (status === 'aborted') {
-        ctx.font = 'bold 20px Inter, sans-serif';
+        ctx.font = 'bold 18px JetBrains Mono, monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('ABORTED', cx, cy - 8);
       } else if (isRunning) {
-        ctx.font = 'bold 16px Inter, sans-serif';
+        ctx.font = 'bold 15px JetBrains Mono, monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('SCANNING...', cx, cy - 8);
       } else {
-        ctx.font = 'bold 36px Inter, sans-serif';
+        ctx.font = '900 36px Outfit, Inter, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(Math.round(currentScore), cx, cy - 8);
       }
 
-      // Label
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '10px Inter, sans-serif';
+      // Label below score
+      ctx.fillStyle = '#a69fb8';
+      ctx.font = 'bold 10px JetBrains Mono, monospace';
       ctx.fillText('RISK SCORE', cx, cy + 16);
     }
 
-    // Animate
     const duration = 1200;
     const startTime = performance.now();
     const startVal = animatedScore.current;
@@ -122,16 +121,16 @@ export default function RiskGauge({ score, status }) {
   }, [score, status, isRunning, info.color]);
 
   return (
-    <GlassCard className="flex flex-col items-center flex-1 w-full h-full p-6">
+    <GlassCard className="flex flex-col h-full w-full p-6 justify-between min-h-[340px]">
       <div className="self-start w-full">
         <SectionHeader 
           title="Risk Score" 
           subtitle={info.label} 
           icon={Gauge} 
-          color="cyan" 
+          color="rose" 
         />
       </div>
-      <div className="relative z-10 scale-110 mt-4 flex-1 flex items-center justify-center">
+      <div className="relative w-full my-auto flex items-center justify-center py-2">
         <canvas ref={canvasRef} />
       </div>
     </GlassCard>

@@ -11,6 +11,7 @@ import RiskChart from '../components/RiskChart';
 import RiskGauge from '../components/RiskGauge';
 import RemediationPanel from '../components/RemediationPanel';
 import AttackGraph from '../components/AttackGraph';
+import CyberOrb3D from '../components/CyberOrb3D';
 import { startScan, getScanStatus, getScanResults, abortScan } from '../api/client';
 import ScanWebSocket from '../api/websocket';
 import { Activity, Network, Globe, Lock, ShieldAlert, ExternalLink, PlusCircle, XCircle, Share2, AlertTriangle } from 'lucide-react';
@@ -85,8 +86,8 @@ export default function Dashboard() {
   useGSAP(() => {
     if (scanResult) {
       gsap.fromTo('.gsap-stagger-item', 
-        { opacity: 0, y: 30, rotationX: 10 }, 
-        { opacity: 1, y: 0, rotationX: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out', clearProps: 'all' }
+        { opacity: 0, y: 20 }, 
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power2.out', clearProps: 'all' }
       );
     }
   }, { dependencies: [scanResult, activeTab], scope: containerRef });
@@ -284,182 +285,195 @@ export default function Dashboard() {
   return (
     <>
       <div 
-        className={`w-full h-full pt-28 pb-8 px-4 md:px-12 flex flex-col space-y-6 relative overflow-hidden transition-transform duration-500 ${selectedVuln ? 'md:-translate-x-[150px]' : ''}`}
+        className={`w-full h-full pt-2 pb-8 px-4 md:px-6 flex flex-col space-y-6 relative overflow-hidden transition-transform duration-500 ${selectedVuln ? 'md:-translate-x-[150px]' : ''}`}
       >
-          {/* Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0">
+        {/* Header with 3D Cyber Sentinel Mascot */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0">
+          <div className="flex items-center gap-4">
+            <CyberOrb3D 
+              size="compact"
+              isScanning={isScanning}
+              status={scanStatus || 'idle'}
+              interactive={true}
+              showRings={true}
+              showParticles={false}
+            />
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Vulnerability Scanner</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">Vulnerability Scanner</h1>
               <p className="mt-1 text-muted-foreground">AI-powered web application security assessment</p>
             </div>
           </div>
+        </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium">
-              {error}
-            </div>
-          )}
+        {/* Error Message */}
+        {error && (
+          <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
-          {/* Active Target Banner */}
-          {targetDomain && (
-            <div className="p-4 rounded-xl bg-card border border-border backdrop-blur-md flex flex-wrap items-center justify-between gap-4 shrink-0 transition-all shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-lg bg-primary/10 border border-primary/20 text-primary">
-                  <Globe className="h-5 w-5 animate-pulse" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Active Scanned Target
-                  </div>
-                  <a
-                    href={targetDomain.startsWith('http') ? targetDomain : `https://${targetDomain}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-lg font-bold text-foreground hover:text-primary transition-colors flex items-center gap-1.5"
-                  >
-                    {targetDomain}
-                    <ExternalLink className="h-4 w-4 opacity-60 hover:opacity-100" />
-                  </a>
-                </div>
-                <span className={`ml-2 px-3 py-1 text-xs font-semibold rounded-full border ${
-                  isScanning
-                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 animate-pulse'
-                    : scanStatus === 'aborted'
-                    ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
-                    : scanStatus === 'error'
-                    ? 'bg-destructive/10 text-destructive border-destructive/30'
-                    : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
-                }`}>
-                  {isScanning ? 'Scan in Progress' : scanStatus === 'aborted' ? 'Scan Aborted' : scanStatus === 'error' ? 'Scan Error' : 'Scan Completed'}
-                </span>
+        {/* Active Target Banner */}
+        {targetDomain && (
+          <div className="p-4 rounded-xl bg-card border border-border backdrop-blur-md flex flex-wrap items-center justify-between gap-4 shrink-0 transition-all shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-primary/10 border border-primary/20 text-primary">
+                <Globe className="h-5 w-5 animate-pulse" />
               </div>
-
-              <div className="flex items-center gap-2">
-                {isScanning && (
-                  <button
-                    onClick={handleAbortRequest}
-                    className="flex items-center gap-1.5 px-4 py-2.5 bg-destructive/10 hover:bg-destructive/20 text-destructive border border-destructive/30 font-medium text-sm rounded-xl transition-all shadow-sm hover:scale-[1.02] active:scale-[0.98]"
-                    title="Abort ongoing scan"
-                  >
-                    <XCircle className="h-4 w-4" />
-                    Abort Scan
-                  </button>
-                )}
-                <button
-                  onClick={() => setShowNewScanInput(prev => !prev)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm rounded-xl transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]"
+              <div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Active Scanned Target
+                </div>
+                <a
+                  href={targetDomain.startsWith('http') ? targetDomain : `https://${targetDomain}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-lg font-bold text-foreground hover:text-primary transition-colors flex items-center gap-1.5"
                 >
-                  <PlusCircle className="h-4 w-4" />
-                  {showNewScanInput ? 'Hide Scan Form' : 'Engage New Scan'}
-                </button>
+                  {targetDomain}
+                  <ExternalLink className="h-4 w-4 opacity-60 hover:opacity-100" />
+                </a>
               </div>
+              <span className={`ml-2 px-3 py-1 text-xs font-semibold rounded-full border ${
+                isScanning
+                  ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 animate-pulse'
+                  : scanStatus === 'aborted'
+                  ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                  : scanStatus === 'error'
+                  ? 'bg-destructive/10 text-destructive border-destructive/30'
+                  : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+              }`}>
+                {isScanning ? 'Scan in Progress' : scanStatus === 'aborted' ? 'Scan Aborted' : scanStatus === 'error' ? 'Scan Error' : 'Scan Completed'}
+              </span>
             </div>
-          )}
 
-          {/* Scanner Input (Shows if no scan active or user clicks Engage New Scan) */}
-          {(!targetDomain || showNewScanInput) && (
-            <div className="shrink-0 transition-all">
-              <ScanForm onScan={handleScan} isScanning={isScanning} />
+            <div className="flex items-center gap-2">
+              {isScanning && (
+                <button
+                  onClick={handleAbortRequest}
+                  className="flex items-center gap-1.5 px-4 py-2.5 bg-destructive/10 hover:bg-destructive/20 text-destructive border border-destructive/30 font-medium text-sm rounded-xl transition-all shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+                  title="Abort ongoing scan"
+                >
+                  <XCircle className="h-4 w-4" />
+                  Abort Scan
+                </button>
+              )}
+              <button
+                onClick={() => setShowNewScanInput(prev => !prev)}
+                className="btn-cyber-primary flex items-center gap-2 px-4 py-2.5 font-medium text-sm rounded-xl transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <PlusCircle className="h-4 w-4" />
+                {showNewScanInput ? 'Hide Scan Form' : 'Engage New Scan'}
+              </button>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Scan Progress */}
-          {isScanning && (
-            <div className="shrink-0">
-              <ScanProgress status={scanStatus} currentPhase={currentPhase} onAbort={handleAbortRequest} />
-            </div>
-          )}
+        {/* Scanner Input (Shows if no scan active or user clicks Engage New Scan) */}
+        {(!targetDomain || showNewScanInput) && (
+          <div className="shrink-0 transition-all">
+            <ScanForm onScan={handleScan} isScanning={isScanning} />
+          </div>
+        )}
 
-          {/* Navigation Tabs */}
-          {scanResult && (
-            <div className="border-b border-border shrink-0">
-              <nav className="-mb-px flex space-x-8">
-                {[
-                  { id: 'overview', label: 'Overview', icon: Activity },
-                  { id: 'vulnerabilities', label: 'Vulnerabilities', icon: ShieldAlert },
-                  { id: 'network', label: 'Network & Ports', icon: Network },
-                  { id: 'web', label: 'Web Headers', icon: Globe },
-                  { id: 'crypto', label: 'SSL/TLS', icon: Lock },
-                  { id: 'graph', label: 'Attack Graph', icon: Share2 },
-                ].map(({ id, label, icon: Icon }) => (
-                  <button
-                    key={id}
-                    onClick={() => setActiveTab(id)}
-                    className={`
-                      group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm
-                      transition-colors duration-200
-                      ${activeTab === id
-                        ? 'border-primary text-primary'
-                        : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                      }
-                    `}
-                  >
-                    <Icon className={`h-4 w-4 ${activeTab === id ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`} />
-                    {label}
-                  </button>
-                ))}
-              </nav>
-            </div>
-          )}
+        {/* Scan Progress */}
+        {isScanning && (
+          <div className="shrink-0">
+            <ScanProgress status={scanStatus} currentPhase={currentPhase} onAbort={handleAbortRequest} />
+          </div>
+        )}
 
-          {/* Tab Content */}
-          {scanResult && (
-            <div className="flex-1 flex flex-col min-h-0 overflow-y-auto pr-2" ref={containerRef}>
-              {activeTab === 'overview' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 flex-1 min-h-0 grid-rows-[auto_1fr]">
-                  <div className="md:col-span-3 xl:col-span-4 gsap-stagger-item perspective-[1000px]">
-                    <QuickInfo scanResult={scanResult} status={isScanning ? 'running' : (scanResult?.status || scanStatus)} />
-                  </div>
-                  <div className="md:col-span-1 xl:col-span-1 flex flex-col min-h-0 gsap-stagger-item perspective-[1000px]">
+        {/* Navigation Tabs */}
+        {scanResult && (
+          <div className="border-b border-border shrink-0">
+            <nav className="-mb-px flex space-x-8">
+              {[
+                { id: 'overview', label: 'Overview', icon: Activity },
+                { id: 'vulnerabilities', label: 'Vulnerabilities', icon: ShieldAlert },
+                { id: 'network', label: 'Network & Ports', icon: Network },
+                { id: 'web', label: 'Web Headers', icon: Globe },
+                { id: 'crypto', label: 'SSL/TLS', icon: Lock },
+                { id: 'graph', label: 'Attack Graph', icon: Share2 },
+              ].map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => setActiveTab(id)}
+                  className={`
+                    group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm
+                    transition-colors duration-200
+                    ${activeTab === id
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                    }
+                  `}
+                >
+                  <Icon className={`h-4 w-4 ${activeTab === id ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`} />
+                  {label}
+                </button>
+              ))}
+            </nav>
+          </div>
+        )}
+
+        {/* Tab Content */}
+        {scanResult && (
+          <div className="flex-1 flex flex-col min-h-0 overflow-y-auto pr-2" ref={containerRef}>
+            {activeTab === 'overview' && (
+              <div className="flex flex-col gap-6 flex-1 min-h-0">
+                <div className="w-full gsap-stagger-item">
+                  <QuickInfo scanResult={scanResult} status={isScanning ? 'running' : (scanResult?.status || scanStatus)} />
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                  <div className="lg:col-span-5 xl:col-span-4 flex flex-col gsap-stagger-item">
                     <RiskGauge score={scanResult?.risk_score?.overall} status={isScanning ? 'running' : (scanResult?.status || scanStatus)} />
                   </div>
-                  <div className="md:col-span-2 xl:col-span-3 flex flex-col min-h-0 gsap-stagger-item perspective-[1000px]">
+                  <div className="lg:col-span-7 xl:col-span-8 flex flex-col gsap-stagger-item">
                     <RiskChart vulnerabilities={scanResult?.vulnerabilities || []} />
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {activeTab === 'vulnerabilities' && (
-                <div className="flex-1 flex flex-col min-h-0 gsap-stagger-item perspective-[1000px]">
-                  <VulnPanel vulnerabilities={scanResult?.vulnerabilities || []} onSelectVuln={setSelectedVuln} />
-                </div>
-              )}
+            {activeTab === 'vulnerabilities' && (
+              <div className="flex-1 flex flex-col min-h-0 gsap-stagger-item">
+                <VulnPanel vulnerabilities={scanResult?.vulnerabilities || []} onSelectVuln={setSelectedVuln} />
+              </div>
+            )}
 
-              {activeTab === 'network' && (
-                <div className="space-y-8">
-                  <div className="gsap-stagger-item">
-                    <PortTable ports={scanResult?.ports || []} />
-                  </div>
+            {activeTab === 'network' && (
+              <div className="space-y-8">
+                <div className="gsap-stagger-item">
+                  <PortTable ports={scanResult?.ports || []} />
                 </div>
-              )}
+              </div>
+            )}
 
-              {activeTab === 'web' && (
-                <div className="space-y-8">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 gsap-stagger-item">
-                    <HeadersPanel headers={scanResult?.headers || {}} />
-                    <CookiePanel cookies={scanResult?.cookies || []} />
-                  </div>
+            {activeTab === 'web' && (
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 gsap-stagger-item">
+                  <HeadersPanel headers={scanResult?.headers || {}} />
+                  <CookiePanel cookies={scanResult?.cookies || []} />
                 </div>
-              )}
+              </div>
+            )}
 
-              {activeTab === 'crypto' && (
-                <div className="space-y-8">
-                  <div className="gsap-stagger-item">
-                    <SSLPanel ssl={scanResult?.ssl || {}} />
-                  </div>
+            {activeTab === 'crypto' && (
+              <div className="space-y-8">
+                <div className="gsap-stagger-item">
+                  <SSLPanel ssl={scanResult?.ssl || {}} />
                 </div>
-              )}
+              </div>
+            )}
 
-              {activeTab === 'graph' && (
-                <div className="flex-1 min-h-[500px] w-full border border-border rounded-xl overflow-hidden bg-card gsap-stagger-item shadow-sm">
-                  <AttackGraph scanResult={scanResult} />
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        
+            {activeTab === 'graph' && (
+              <div className="flex-1 min-h-[500px] w-full border border-border rounded-xl overflow-hidden bg-card gsap-stagger-item shadow-sm">
+                <AttackGraph scanResult={scanResult} />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      
       <RemediationPanel vulnerability={selectedVuln} onClose={() => setSelectedVuln(null)} scanId={scanId} />
 
       {/* Abort Confirmation Modal */}

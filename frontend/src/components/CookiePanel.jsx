@@ -1,39 +1,34 @@
+import React from 'react';
 import { Cookie, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import GlassCard from './ui/GlassCard';
+import SectionHeader from './ui/SectionHeader';
 
-export default function CookiePanel({ cookies }) {
+export default function CookiePanel({ cookies = [] }) {
   if (!cookies || cookies.length === 0) {
     return (
-      <div className="glass-panel p-6 sm:p-8 animate-fade-in">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-secondary/10">
-            <Cookie className="h-5 w-5 text-accent-secondary" />
-          </div>
-          <h3 className="font-semibold text-text-primary">Cookies</h3>
-        </div>
-        <p className="text-sm text-text-muted">No cookies detected.</p>
-      </div>
+      <GlassCard className="p-6">
+        <SectionHeader title="Session & Auth Cookies" icon={Cookie} color="purple" />
+        <p className="text-xs font-mono text-muted-foreground mt-4">No cookies detected on target domain.</p>
+      </GlassCard>
     );
   }
 
   return (
-    <div className="glass-panel p-6 sm:p-8 animate-fade-in">
-      <div className="flex items-center gap-3 mb-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-secondary/10">
-          <Cookie className="h-5 w-5 text-accent-secondary" />
-        </div>
-        <div>
-          <h3 className="font-semibold text-text-primary">Cookies</h3>
-          <p className="text-xs text-text-muted">{cookies.length} cookie{cookies.length !== 1 ? 's' : ''} found</p>
-        </div>
-      </div>
+    <GlassCard className="p-6">
+      <SectionHeader 
+        title="Session & Auth Cookies" 
+        subtitle={`${cookies.length} cookie${cookies.length !== 1 ? 's' : ''} inspected`}
+        icon={Cookie} 
+        color="purple" 
+      />
 
-      <div className="space-y-3">
+      <div className="space-y-3 mt-5">
         {cookies.map((cookie, i) => (
-          <div key={`${cookie.name}-${i}`} className="rounded-xl bg-bg-card/60 border border-border-default/50 p-4 hover:border-border-glow transition-all">
+          <div key={`${cookie.name}-${i}`} className="rounded-2xl bg-white/5 border border-purple-500/20 p-4 hover:border-purple-500/40 transition-all">
             <div className="flex items-center justify-between mb-2">
-              <span className="font-mono text-sm font-semibold text-accent-primary">{cookie.name}</span>
+              <span className="font-mono text-xs font-bold text-rose-300">{cookie.name}</span>
               {cookie.issues?.length > 0 && (
-                <span className="text-[10px] font-medium text-severity-medium bg-severity-medium/10 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 rounded-full">
                   {cookie.issues.length} issue{cookie.issues.length !== 1 ? 's' : ''}
                 </span>
               )}
@@ -48,10 +43,10 @@ export default function CookiePanel({ cookies }) {
               ].map((flag) => (
                 <span
                   key={flag.label}
-                  className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md ${
+                  className={`inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg border ${
                     flag.value
-                      ? 'bg-accent-emerald/10 text-accent-emerald'
-                      : 'bg-severity-critical/10 text-severity-critical'
+                      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                      : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
                   }`}
                 >
                   {flag.value ? (
@@ -69,8 +64,8 @@ export default function CookiePanel({ cookies }) {
             {cookie.issues?.length > 0 && (
               <div className="mt-2 space-y-1">
                 {cookie.issues.map((issue, j) => (
-                  <p key={j} className="text-xs text-severity-medium flex items-center gap-1.5">
-                    <AlertTriangle className="h-3 w-3 shrink-0" />
+                  <p key={j} className="text-xs font-mono text-amber-300/90 flex items-center gap-1.5">
+                    <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-400" />
                     {issue}
                   </p>
                 ))}
@@ -79,6 +74,6 @@ export default function CookiePanel({ cookies }) {
           </div>
         ))}
       </div>
-    </div>
+    </GlassCard>
   );
 }

@@ -14,77 +14,77 @@ export default function QuickInfo({ scanResult, status: propStatus }) {
       icon: Globe,
       label: 'IP Address',
       value: dns?.ip_address || (isRunning ? 'Resolving...' : '—'),
-      color: 'text-primary',
-      bg: 'bg-primary/10',
+      color: 'text-rose-400',
+      bg: 'bg-rose-500/15 border-rose-500/30',
     },
     {
       icon: MapPin,
-      label: 'Country',
+      label: 'Country / Region',
       value: dns?.country || (isRunning ? 'Checking...' : '—'),
-      color: 'text-muted-foreground',
-      bg: 'bg-foreground/5',
+      color: 'text-fuchsia-400',
+      bg: 'bg-fuchsia-500/15 border-fuchsia-500/30',
     },
     {
       icon: Server,
-      label: 'Server',
+      label: 'Server Engine',
       value: fingerprint?.server || (isRunning ? 'Fingerprinting...' : '—'),
-      color: 'text-muted-foreground',
-      bg: 'bg-foreground/5',
+      color: 'text-purple-400',
+      bg: 'bg-purple-500/15 border-purple-500/30',
     },
     {
       icon: Cpu,
-      label: 'Technologies',
+      label: 'Tech Stack',
       value: fingerprint?.technologies?.length
         ? fingerprint.technologies.slice(0, 3).join(', ')
         : (isRunning ? 'Analyzing...' : '—'),
-      color: 'text-muted-foreground',
-      bg: 'bg-foreground/5',
+      color: 'text-indigo-400',
+      bg: 'bg-indigo-500/15 border-indigo-500/30',
     },
     {
       icon: Network,
       label: 'Open Ports',
       value: isRunning && (!ports || ports.length === 0) ? 'Scanning...' : (ports?.length?.toString() || '0'),
-      color: 'text-orange-500',
-      bg: 'bg-orange-500/10',
+      color: 'text-orange-400',
+      bg: 'bg-orange-500/15 border-orange-500/30',
     },
     {
       icon: Shield,
-      label: 'Risk Score',
+      label: 'Risk Posture',
       value: isRunning ? 'Scanning...' : currentStatus === 'aborted' ? 'Aborted' : currentStatus === 'error' ? 'N/A' : `${risk_score?.overall ?? 0}/100`,
       color: '',
-      bg: '',
+      bg: 'bg-rose-500/15 border-rose-500/30',
       customColor: scoreInfo.color,
       sublabel: scoreInfo.label,
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 stagger-children">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
       {cards.map((card) => (
         <div
           key={card.label}
-          className="glass-panel p-6 flex flex-col items-center text-center gap-3 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(220,38,38,0.15)] transition-all duration-300"
+          className="glass-card p-5 flex flex-col items-center text-center gap-2.5 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(244,63,94,0.18)] transition-all duration-300"
         >
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${card.bg || 'bg-bg-card'}`}>
+          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl border ${card.bg}`}>
             <card.icon
-              className="h-6 w-6"
+              className="h-5 w-5"
               style={card.customColor ? { color: card.customColor } : undefined}
-              {...(!card.customColor ? { className: `h-6 w-6 ${card.color}` } : {})}
+              {...(!card.customColor ? { className: `h-5 w-5 ${card.color}` } : {})}
             />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">
+            <p className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mb-0.5">
               {card.label}
             </p>
             <p
-              className="text-sm font-semibold text-foreground truncate max-w-[140px]"
+              className="text-xs font-black text-foreground truncate max-w-[130px]"
               title={card.value}
               style={card.customColor ? { color: card.customColor } : undefined}
             >
               {card.value}
             </p>
             {card.sublabel && (
-              <p className="text-[10px] font-medium mt-0.5" style={{ color: card.customColor }}>
+              <p className="text-[9px] font-mono font-bold mt-0.5" style={{ color: card.customColor }}>
                 {card.sublabel}
               </p>
             )}

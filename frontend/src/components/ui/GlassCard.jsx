@@ -1,15 +1,20 @@
 import React from 'react';
 
-export default function GlassCard({ className = '', tone = 'default', children }) {
+export default function GlassCard({ className = '', tone = 'default', children, onClick = null }) {
   const toneClass =
     tone === 'ai'
-      ? 'border-violet-400/30 bg-violet-500/5 shadow-[0_0_40px_rgba(139,92,246,0.08)]'
+      ? 'border-purple-500/35 bg-purple-500/10 shadow-[0_0_40px_rgba(168,85,247,0.15)]'
       : tone === 'critical'
-      ? 'border-rose-400/30 bg-rose-500/10'
-      : 'border-white/10 bg-black/60';
+      ? 'border-rose-500/40 bg-rose-500/10 shadow-[0_0_40px_rgba(244,63,94,0.2)]'
+      : tone === 'coral'
+      ? 'border-orange-500/35 bg-orange-500/10 shadow-[0_0_40px_rgba(251,146,60,0.15)]'
+      : 'border-rose-500/20 bg-card/85';
 
   return (
-    <section className={`rounded-3xl border backdrop-blur-md ${toneClass} ${className}`}>
+    <section 
+      onClick={onClick}
+      className={`rounded-3xl border backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-300 ${toneClass} ${className}`}
+    >
       {children}
     </section>
   );

@@ -18,7 +18,12 @@ import { ThemeProvider } from './components/ThemeProvider';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
-  if (loading) return <div className="h-screen w-screen flex items-center justify-center">Loading...</div>;
+  if (loading) return (
+    <div className="h-screen w-screen flex flex-col items-center justify-center bg-background text-foreground gap-4">
+      <div className="w-12 h-12 rounded-full border-4 border-rose-500/20 border-t-rose-500 animate-spin" />
+      <span className="font-mono text-xs text-rose-400 tracking-widest uppercase">Connecting to VulneraX Sentinel...</span>
+    </div>
+  );
   if (!user) return <Navigate to="/login" />;
   return children;
 }
@@ -34,11 +39,11 @@ function MainLayout() {
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="w-full h-full flex flex-col max-w-7xl mx-auto pt-8 pb-12"
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="w-full min-h-full flex-1 flex flex-col max-w-7xl mx-auto pt-20 pb-20"
             >
               <Routes location={location}>
                 <Route path="/" element={<Landing />} />
@@ -64,8 +69,6 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <div className="relative w-screen h-screen overflow-hidden bg-background text-foreground transition-colors duration-500">
-          <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/40 to-background/80 pointer-events-none z-0" />
-          
           <div className="relative z-10 w-full h-full">
             <BrowserRouter>
               <Routes>

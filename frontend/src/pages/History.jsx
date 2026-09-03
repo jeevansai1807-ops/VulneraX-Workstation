@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { History as HistoryIcon, Search, Shield, ExternalLink, Loader2, RefreshCw, Trash2, Sparkles, FileText, Download, X, Code, CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getScanHistory, deleteScan, getScanResults, getReport } from '../api/client';
+import { getScanHistory, deleteScan, getScanResults, getReport, getScanStatus } from '../api/client';
 import { formatTimestamp, riskScoreColor } from '../utils/helpers';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';

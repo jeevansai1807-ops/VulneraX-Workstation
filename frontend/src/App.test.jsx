@@ -15,7 +15,8 @@ test('renders the routed platform shell', async () => {
   localStorage.setItem('vulnerax_token', 'mock-test-token');
   render(<App />);
 
-  expect(await screen.findByRole('link', { name: /dashboard/i })).toBeInTheDocument();
-  expect(await screen.findByRole('link', { name: /active scans/i })).toBeInTheDocument();
-  expect(await screen.findByRole('link', { name: /ai reports/i })).toBeInTheDocument();
+  expect(await screen.findByRole('link', { name: /^home$/i })).toBeInTheDocument();
+  expect(await screen.findByRole('link', { name: /scanner/i })).toBeInTheDocument();
+  expect(await screen.findByRole('link', { name: /database/i })).toBeInTheDocument();
+  expect(await screen.findByRole('link', { name: /settings/i })).toBeInTheDocument();
 });
